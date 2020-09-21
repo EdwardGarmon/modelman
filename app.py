@@ -9,7 +9,6 @@ def index():
 
 @app.route('/populateScript',methods=['POST'])
 def handle_script():
-    
     content = request.get_json()
     req_script = content.get("req_script")
     temp = content.get("temp")
