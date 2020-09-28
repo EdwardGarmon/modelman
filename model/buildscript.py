@@ -12,6 +12,10 @@ import requests
 import re
 import json
 
+
+np.seterr(divide = 'ignore')
+
+
 def load_doc(filename):
     # open the file as read only
     file = open(filename, 'r')
@@ -27,11 +31,6 @@ def save_doc(lines, filename,delimiter = '\n'):
     file.write(data)
     file.close()
 
-from pickle import load
-tokenizer = load(open('model/MasterTokenizer.pkl', 'rb'))
-
-
-seq_to_word = dict(map(reversed, tokenizer.word_index.items()))
 
 def decode(seq):
     seq = list(seq)
@@ -48,21 +47,41 @@ def sample(preds, temperature=1.0):
     probas = np.random.multinomial(1, preds, 1)
     return np.argmax(probas)
 
+def load():
+    global seq_to_word
+    global jerrymodel
+    global elainemodel
+    global kramermodel
+    global georgemodel
 
-jerrymodel = load_model('model/jerry_model.h5')
-georgemodel = load_model('model/george_model.h5')
-elainemodel = load_model('model/elaine_model.h5')
-kramermodel = load_model('model/kramer_model.h5')
+    global seq_length
+    global jerry_i
+    global george_i
+    global elaine_i
+    global kramer_i
+    global other_i
+    global tokenizer
 
+    from pickle import load
+    tokenizer = load(open('model/MasterTokenizer.pkl', 'rb'))
 
-seq_length = 25
+ 
 
+    seq_to_word = dict(map(reversed, tokenizer.word_index.items()))
 
-jerry_i = tokenizer.word_index["jerry:"]
-george_i = tokenizer.word_index["george:"]
-elaine_i = tokenizer.word_index["elaine:"]
-kramer_i = tokenizer.word_index["kramer:"]
-other_i = tokenizer.word_index["other:"]
+    jerrymodel = load_model('model/jerry_model.h5')
+    georgemodel = load_model('model/george_model.h5')
+    elainemodel = load_model('model/elaine_model.h5')
+    kramermodel = load_model('model/kramer_model.h5')
+
+    seq_length = 25
+
+    jerry_i = tokenizer.word_index["jerry:"]
+    george_i = tokenizer.word_index["george:"]
+    elaine_i = tokenizer.word_index["elaine:"]
+    kramer_i = tokenizer.word_index["kramer:"]
+    other_i = tokenizer.word_index["other:"]
+
 
 def predict_text(model,tokenizer,seed_in,temperature,n_words,seq_length,char_index):
 
@@ -85,11 +104,8 @@ def predict_text(model,tokenizer,seed_in,temperature,n_words,seq_length,char_ind
         seed_in = np.delete(seed_in,0)
 
 
-    
     return full_sequence
 
-
-np.seterr(divide = 'ignore')
 
 
 def populate(temp:float, req_script:[str]):

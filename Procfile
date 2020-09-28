@@ -1,1 +1,1 @@
-web: /bin/bash launch.sh
+web: gunicorn app:app --worker-class gevent
